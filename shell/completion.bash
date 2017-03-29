@@ -232,12 +232,17 @@ _fzf_complete_telnet() {
 }
 
 _fzf_complete_ssh() {
+  local fzfct
+  fzfct=$FZF_COMPLETION_TRIGGER
+  FZF_COMPLETION_TRIGGER=''
   _fzf_complete '+m' "$@" < <(
     cat <(cat ~/.ssh/config /etc/ssh/ssh_config 2> /dev/null | command grep -i '^host' | command grep -v '*') \
-        <(command grep -oE '^[a-z0-9.,:-]+' ~/.ssh/known_hosts | tr ',' '\n' | awk '{ print $1 " " $1 }') \
-        <(command grep -v '^\s*\(#\|$\)' /etc/hosts | command grep -Fv '0.0.0.0') |
+        <(command grep -oE '^[a-z0-9.,-]+' ~/.ssh/known_hosts | tr ',' '\n' | awk '{ print $1 " " $1 }') \
+        <(command grep -v '^\s*\(#\|$\)' /etc/hosts | command grep -Fv '0.0.0.0') \
+        <(cat ~/.hosts 2> /dev/null | command awk '{ print $1 " " $1 }') |
         awk '{if (length($2) > 0) {print $2}}' | sort -u
   )
+  FZF_COMPLETION_TRIGGER=$fzfct
 }
 
 _fzf_complete_unset() {

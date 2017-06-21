@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/junegunn/i/master/fzf.png" height="170" alt="fzf - a command-line fuzzy finder"> [![travis-ci](https://travis-ci.org/junegunn/fzf.svg?branch=master)](https://travis-ci.org/junegunn/fzf)
+<img src="https://raw.githubusercontent.com/junegunn/i/master/fzf.png" height="170" alt="fzf - a command-line fuzzy finder"> [![travis-ci](https://travis-ci.org/junegunn/fzf.svg?branch=master)](https://travis-ci.org/junegunn/fzf) [![Donate via PayPal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=EKYAW9PGKPD2N)
 ===
 
 fzf is a general-purpose command-line fuzzy finder.
@@ -14,6 +14,39 @@ Pros
 - Flexible layout using tmux panes
 - Batteries included
     - Vim/Neovim plugin, key bindings and fuzzy auto-completion
+
+Table of Contents
+-----------------
+
+   * [Installation](#installation)
+      * [Using git](#using-git)
+      * [Using Homebrew](#using-homebrew)
+      * [As Vim plugin](#as-vim-plugin)
+      * [Windows](#windows)
+   * [Upgrading fzf](#upgrading-fzf)
+   * [Building fzf](#building-fzf)
+   * [Usage](#usage)
+      * [Using the finder](#using-the-finder)
+      * [Layout](#layout)
+      * [Search syntax](#search-syntax)
+      * [Environment variables](#environment-variables)
+      * [Options](#options)
+   * [Examples](#examples)
+   * [fzf-tmux script](#fzf-tmux-script)
+   * [Key bindings for command line](#key-bindings-for-command-line)
+   * [Fuzzy completion for bash and zsh](#fuzzy-completion-for-bash-and-zsh)
+      * [Files and directories](#files-and-directories)
+      * [Process IDs](#process-ids)
+      * [Host names](#host-names)
+      * [Environment variables / Aliases](#environment-variables--aliases)
+      * [Settings](#settings)
+      * [Supported commands](#supported-commands)
+   * [Vim plugin](#vim-plugin)
+   * [Tips](#tips)
+      * [Respecting .gitignore, <code>.hgignore</code>, and <code>svn:ignore</code>](#respecting-gitignore-hgignore-and-svnignore)
+      * [git ls-tree for fast traversal](#git-ls-tree-for-fast-traversal)
+      * [Fish shell](#fish-shell)
+   * [<a href="LICENSE">License</a>](#license)
 
 Installation
 ------------
@@ -53,7 +86,7 @@ brew install fzf
 /usr/local/opt/fzf/install
 ```
 
-### Vim plugin
+### As Vim plugin
 
 You can manually add the directory to `&runtimepath` as follows,
 
@@ -98,6 +131,7 @@ method used.
 
 - git: `cd ~/.fzf && git pull && ./install`
 - brew: `brew update; brew reinstall fzf`
+- chocolatey: `choco upgrade fzf`
 - vim-plug: `:PlugUpdate fzf`
 
 Building fzf
@@ -108,7 +142,7 @@ See [BUILD.md](BUILD.md).
 Usage
 -----
 
-fzf will launch curses-based finder, read the list from STDIN, and write the
+fzf will launch interactive finder, read the list from STDIN, and write the
 selected item to STDOUT.
 
 ```sh
@@ -340,79 +374,14 @@ On bash, fuzzy completion is enabled only for a predefined set of commands
 commands as well like follows.
 
 ```sh
-# There are also _fzf_path_completion and _fzf_dir_completion
-complete -F _fzf_file_completion -o default -o bashdefault doge
+complete -F _fzf_path_completion -o default -o bashdefault ag
+complete -F _fzf_dir_completion -o default -o bashdefault tree
 ```
 
-Usage as Vim plugin
--------------------
+Vim plugin
+----------
 
-This repository only enables basic integration with Vim. If you're looking for
-more, check out [fzf.vim](https://github.com/junegunn/fzf.vim) project.
-
-(Note: To use fzf in GVim, an external terminal emulator is required.)
-
-#### `:FZF[!]`
-
-If you have set up fzf for Vim, `:FZF` command will be added.
-
-```vim
-" Look for files under current directory
-:FZF
-
-" Look for files under your home directory
-:FZF ~
-
-" With options
-:FZF --no-sort --reverse --inline-info /tmp
-
-" Bang version starts fzf in fullscreen mode
-:FZF!
-```
-
-Similarly to [ctrlp.vim](https://github.com/kien/ctrlp.vim), use enter key,
-`CTRL-T`, `CTRL-X` or `CTRL-V` to open selected files in the current window,
-in new tabs, in horizontal splits, or in vertical splits respectively.
-
-Note that the environment variables `FZF_DEFAULT_COMMAND` and
-`FZF_DEFAULT_OPTS` also apply here. Refer to [the wiki page][fzf-config] for
-customization.
-
-[fzf-config]: https://github.com/junegunn/fzf/wiki/Configuring-Vim-plugin
-
-#### `fzf#run`
-
-For more advanced uses, you can use `fzf#run([options])` function with the
-following options.
-
-| Option name                | Type          | Description                                                      |
-| -------------------------- | ------------- | ---------------------------------------------------------------- |
-| `source`                   | string        | External command to generate input to fzf (e.g. `find .`)        |
-| `source`                   | list          | Vim list as input to fzf                                         |
-| `sink`                     | string        | Vim command to handle the selected item (e.g. `e`, `tabe`)       |
-| `sink`                     | funcref       | Reference to function to process each selected item              |
-| `sink*`                    | funcref       | Similar to `sink`, but takes the list of output lines at once    |
-| `options`                  | string        | Options to fzf                                                   |
-| `dir`                      | string        | Working directory                                                |
-| `up`/`down`/`left`/`right` | number/string | Use tmux pane with the given size (e.g. `20`, `50%`)             |
-| `window` (*Neovim only*)   | string        | Command to open fzf window (e.g. `vertical aboveleft 30new`)     |
-| `launcher`                 | string        | External terminal emulator to start fzf with (GVim only)         |
-| `launcher`                 | funcref       | Function for generating `launcher` string (GVim only)            |
-
-Examples can be found on [the wiki
-page](https://github.com/junegunn/fzf/wiki/Examples-(vim)).
-
-#### `fzf#wrap`
-
-`fzf#wrap([name string,] [opts dict,] [fullscreen boolean])` is a helper
-function that decorates the options dictionary so that it understands
-`g:fzf_layout`, `g:fzf_action`, `g:fzf_colors`, and `g:fzf_history_dir` like
-`:FZF`.
-
-```vim
-command! -bang MyStuff
-  \ call fzf#run(fzf#wrap('my-stuff', {'dir': '~/my-stuff'}, <bang>0))
-```
+See [README-VIM.md](README-VIM.md).
 
 Tips
 ----
@@ -458,9 +427,9 @@ export FZF_DEFAULT_COMMAND='
 #### Fish shell
 
 It's [a known bug of fish](https://github.com/fish-shell/fish-shell/issues/1362)
-that it doesn't allow reading from STDIN in command substitution, which means
-simple `vim (fzf)` won't work as expected. The workaround is to use the `read`
-fish command:
+(will be fixed in 2.6.0) that it doesn't allow reading from STDIN in command
+substitution, which means simple `vim (fzf)` won't work as expected. The
+workaround is to use the `read` fish command:
 
 ```sh
 fzf | read -l result; and vim $result
